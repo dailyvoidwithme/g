@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OP Store · College Project</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Secret Admin Link (hidden in footer) -->
+    <div class="secret-admin-link" style="display: none;">admin_nexus_2024</div>
+
+    <!-- Main Store Content -->
+    <div class="hero-section">
+        <h1 id="storeName">OP STORE</h1>
+        <p id="storeCaption" class="glow-text">Premium Products · College Edition</p>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="products-container" id="productsGrid"></div>
+
+    <!-- Page 2: Contact Info -->
+    <div class="page-section" id="contactPage">
+        <h2><i class="fab fa-telegram"></i> Contact Details</h2>
+        <div class="contact-form">
+            <input type="text" id="telegramInput" placeholder="Your Telegram username">
+            <input type="text" id="whatsappInput" placeholder="Your WhatsApp number">
+            <button onclick="proceedToPayment()" class="next-btn">Continue to Payment →</button>
+        </div>
+    </div>
+
+    <!-- Page 3: QR & Verification -->
+    <div class="page-section" id="paymentPage">
+        <h2><i class="fas fa-qrcode"></i> Payment Verification</h2>
+        <div class="qr-container">
+            <img id="qrCode" src="" alt="Payment QR">
+            <div class="payment-details">
+                <p>Scan QR to pay</p>
+                <button onclick="verifyPayment()" class="verify-btn">
+                    <i class="fab fa-telegram"></i> VERIFY PAYMENT
+                </button>
+            </div>
+        </div>
+        <div id="messageBox" class="message-box"></div>
+    </div>
+
+    <!-- Footer with hidden admin link -->
+    <footer>
+        <p>© 2024 · <a href="#" onclick="openAdminPanel()">hidden</a></p>
+    </footer>
+
+    <script src="config.js"></script>
+    <script src="products.json"></script>
+    <script>
+        // Load products from JSON
+        let products = [];
+        fetch('products.json')
+            .then(response => response.json())
+            .then(data => {
+                products = data;
+                displayProducts();
+            });
+
+        function displayProducts() {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = products.map(p => `
+                <div class="product-card">
+                    <img src="${p.image}" alt="${p.name}">
+                    <h3>${p.name}</h3>
+                    <p class="price">${CONFIG.currency}${p.price}</p>
+                    <button onclick="selectProduct('${p.name}', ${p.price})" class="buy-btn">
+                        BUY NOW <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        let selectedProduct = null;
+        function selectProduct(name, price) {
+            selectedProduct = { name, price };
+            document.getElementById('contactPage').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function proceedToPayment() {
+            const telegram = document.getElementById('telegramInput').value;
+            const whatsapp = document.getElementById('whatsappInput').value;
+            
+            if (!telegram || !whatsapp) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            sessionStorage.setItem('contact', JSON.stringify({ telegram, whatsapp }));
+            document.getElementById('paymentPage').scrollIntoView({ behavior: 'smooth' });
+            
+            // Update QR with store info
+            const qrData = `${CONFIG.storeName} - Payment to ${CONFIG.paymentDetails}`;
+            document.getElementById('qrCode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}`;
+        }
+
+        function verifyPayment() {
+            const contact = JSON.parse(sessionStorage.getItem('contact'));
+            const message = `🛒 *NEW ORDER* from ${CONFIG.storeName}%0A` +
+                           `Product: ${selectedProduct.name}%0A` +
+                           `Price: ${CONFIG.currency}${selectedProduct.price}%0A` +
+                           `Telegram: @${contact.telegram}%0A` +
+                           `WhatsApp: ${contact.whatsapp}%0A` +
+                           `✅ Payment Verified`;
+
+            document.getElementById('messageBox').innerHTML = `
+                <i class="fab fa-telegram"></i> 
+                Auto-message: ${decodeURIComponent(message).replace(/%0A/g, ' ')}
+            `;
+
+            // Open Telegram with message
+            window.open(`https://t.me/${CONFIG.telegramTarget}?text=${message}`, '_blank');
+        }
+
+        // Hidden admin panel access
+        function openAdminPanel() {
+            const password = prompt('Enter admin password:');
+            if (password === CONFIG.adminPassword) {
+                window.location.href = 'admin.html';
+            } else {
+                alert('Access denied');
+            }
+        }
+    </script>
+</body>
+</html>
