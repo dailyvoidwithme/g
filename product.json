@@ -1,0 +1,22 @@
+[
+    {
+        "name": "OP Gaming Phone",
+        "price": 499.99,
+        "image": "https://placehold.co/400x400/1a1f2f/ffb347?text=OP+PHONE"
+    },
+    {
+        "name": "Wireless Buds Pro",
+        "price": 89.99,
+        "image": "https://placehold.co/400x400/2d2f4e/ffb347?text=BUDS"
+    },
+    {
+        "name": "Smart Watch Ultra",
+        "price": 199.99,
+        "image": "https://placehold.co/400x400/3b2f4f/ffb347?text=WATCH"
+    },
+    {
+        "name": "Power Bank 20k",
+        "price": 49.99,
+        "image": "https://placehold.co/400x400/4a2f3f/ffb347?text=POWER"
+    }
+]
