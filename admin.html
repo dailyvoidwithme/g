@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel · OP Store</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        body {
+            background: #0a0c14;
+            color: #fff;
+            padding: 20px;
+        }
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .admin-header {
+            background: linear-gradient(145deg, #1a1f2f, #0d1120);
+            padding: 30px;
+            border-radius: 30px;
+            margin-bottom: 30px;
+            border: 1px solid #ffd70033;
+        }
+        .admin-section {
+            background: #141a2b;
+            border-radius: 25px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #ffb34733;
+        }
+        h2 {
+            color: #ffb347;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aab4d3;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 15px 20px;
+            background: #1f263b;
+            border: 2px solid #2f3855;
+            border-radius: 15px;
+            color: white;
+            font-size: 1rem;
+        }
+        input:focus {
+            border-color: #ffb347;
+            outline: none;
+        }
+        .btn {
+            background: #ffb347;
+            color: #0a0c14;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: 0.3s;
+        }
+        .btn-danger {
+            background: #ff4757;
+            color: white;
+        }
+        .btn-success {
+            background: #00d25b;
+        }
+        .product-item {
+            background: #1e253a;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr auto auto;
+            gap: 10px;
+            align-items: center;
+        }
+        .security-section {
+            background: #1a1030;
+            border-left: 5px solid #ff4757;
+        }
+        .password-change {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1><i class="fas fa-crown" style="color: #ffb347;"></i> Secret Admin Nexus</h1>
+            <p>Access Link: <code style="background:#000; padding:5px;">index.html#admin_nexus_2024</code></p>
+        </div>
+
+        <!-- Store Settings Section -->
+        <div class="admin-section">
+            <h2><i class="fas fa-store"></i> Store Settings</h2>
+            <div class="input-group">
+                <label>Store Name</label>
+                <input type="text" id="storeName" value="OP STORE">
+            </div>
+            <div class="input-group">
+                <label>Store Caption</label>
+                <input type="text" id="storeCaption" value="Premium Products · College Edition">
+            </div>
+            <div class="input-group">
+                <label>Currency Symbol</label>
+                <input type="text" id="currency" value="$">
+            </div>
+            <button class="btn" onclick="saveStoreSettings()">Save Store Settings</button>
+        </div>
+
+        <!-- Target Settings -->
+        <div class="admin-section">
+            <h2><i class="fas fa-bullseye"></i> Message Targets</h2>
+            <div class="input-group">
+                <label>Telegram Username (where messages go)</label>
+                <input type="text" id="telegramTarget" value="op_college_bot">
+            </div>
+            <div class="input-group">
+                <label>WhatsApp Number</label>
+                <input type="text" id="whatsappTarget" value="+1234567890">
+            </div>
+            <div class="input-group">
+                <label>Payment Details (for QR)</label>
+                <textarea id="paymentDetails" rows="2">UPI: op@paytm · Scan QR</textarea>
+            </div>
+            <button class="btn" onclick="saveTargets()">Save Targets</button>
+        </div>
+
+        <!-- Product Management -->
+        <div class="admin-section">
+            <h2><i class="fas fa-boxes"></i> Products (Unlimited)</h2>
+            <div id="productsList"></div>
+            
+            <h3 style="margin: 30px 0 15px;">Add New Product</h3>
+            <div class="input-group">
+                <label>Product Name</label>
+                <input type="text" id="newProductName" placeholder="e.g. OP Gaming Phone">
+            </div>
+            <div class="input-group">
+                <label>Price</label>
+                <input type="number" id="newProductPrice" placeholder="499.99">
+            </div>
+            <div class="input-group">
+                <label>Image URL</label>
+                <input type="text" id="newProductImage" placeholder="https://...">
+            </div>
+            <button class="btn btn-success" onclick="addProduct()">➕ Add Product</button>
+        </div>
+
+        <!-- Security Section (Change Password) -->
+        <div class="admin-section security-section">
+            <h2><i class="fas fa-shield-alt"></i> Security Settings</h2>
+            <div class="password-change">
+                <input type="password" id="newPassword" placeholder="New admin password">
+                <input type="password" id="confirmPassword" placeholder="Confirm password">
+                <button class="btn" onclick="changePassword()">Change Password</button>
+            </div>
+            <p style="color: #ff6b6b; margin-top: 15px;">
+                <i class="fas fa-exclamation-triangle"></i> 
+                Admin panel access: Click "hidden" in footer → enter password
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Load current config
+        let config = JSON.parse(localStorage.getItem('adminConfig')) || {
+            storeName: 'OP STORE',
+            storeCaption: 'Premium Products · College Edition',
+            currency: '$',
+            telegramTarget: 'op_college_bot',
+            whatsappTarget: '+1234567890',
+            paymentDetails: 'UPI: op@paytm',
+            adminPassword: 'admin123'
+        };
+
+        let products = JSON.parse(localStorage.getItem('products')) || [
+            { name: 'OP Gaming Phone', price: 499.99, image: 'https://placehold.co/400x400/1a1f2f/ffb347?text=OP' },
+            { name: 'Wireless Buds', price: 89.99, image: 'https://placehold.co/400x400/2d2f4e/ffb347?text=BUDS' }
+        ];
+
+        // Load settings into inputs
+        function loadSettings() {
+            document.getElementById('storeName').value = config.storeName;
+            document.getElementById('storeCaption').value = config.storeCaption;
+            document.getElementById('currency').value = config.currency;
+            document.getElementById('telegramTarget').value = config.telegramTarget;
+            document.getElementById('whatsappTarget').value = config.whatsappTarget;
+            document.getElementById('paymentDetails').value = config.paymentDetails;
+        }
+
+        // Display products
+        function displayProducts() {
+            const list = document.getElementById('productsList');
+            list.innerHTML = products.map((p, index) => `
+                <div class="product-item">
+                    <input type="text" value="${p.name}" onchange="updateProduct(${index}, 'name', this.value)">
+                    <input type="number" value="${p.price}" onchange="updateProduct(${index}, 'price', this.value)">
+                    <input type="text" value="${p.image}" onchange="updateProduct(${index}, 'image', this.value)">
+                    <button class="btn-danger" onclick="deleteProduct(${index})"><i class="fas fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        // Save store settings
+        function saveStoreSettings() {
+            config.storeName = document.getElementById('storeName').value;
+            config.storeCaption = document.getElementById('storeCaption').value;
+            config.currency = document.getElementById('currency').value;
+            localStorage.setItem('adminConfig', JSON.stringify(config));
+            alert('Store settings saved!');
+        }
+
+        // Save targets
+        function saveTargets() {
+            config.telegramTarget = document.getElementById('telegramTarget').value;
+            config.whatsappTarget = document.getElementById('whatsappTarget').value;
+            config.paymentDetails = document.getElementById('paymentDetails').value;
+            localStorage.setItem('adminConfig', JSON.stringify(config));
+            alert('Targets saved!');
+        }
+
+        // Add product
+        function addProduct() {
+            const name = document.getElementById('newProductName').value;
+            const price = parseFloat(document.getElementById('newProductPrice').value);
+            const image = document.getElementById('newProductImage').value;
+
+            if (!name || !price || !image) {
+                alert('Fill all fields');
+                return;
+            }
+
+            products.push({ name, price, image });
+            localStorage.setItem('products', JSON.stringify(products));
+            displayProducts();
+            
+            // Clear inputs
+            document.getElementById('newProductName').value = '';
+            document.getElementById('newProductPrice').value = '';
+            document.getElementById('newProductImage').value = '';
+        }
+
+        // Update product
+        function updateProduct(index, field, value) {
+            if (field === 'price') value = parseFloat(value);
+            products[index][field] = value;
+            localStorage.setItem('products', JSON.stringify(products));
+        }
+
+        // Delete product
+        function deleteProduct(index) {
+            if (confirm('Delete this product?')) {
+                products.splice(index, 1);
+                localStorage.setItem('products', JSON.stringify(products));
+                displayProducts();
+            }
+        }
+
+        // Change password
+        function changePassword() {
+            const newPass = document.getElementById('newPassword').value;
+            const confirm = document.getElementById('confirmPassword').value;
+
+            if (!newPass || !confirm) {
+                alert('Fill both fields');
+                return;
+            }
+
+            if (newPass !== confirm) {
+                alert('Passwords do not match');
+                return;
+            }
+
+            config.adminPassword = newPass;
+            localStorage.setItem('adminConfig', JSON.stringify(config));
+            alert('Password changed successfully!');
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+        }
+
+        // Initialize
+        loadSettings();
+        displayProducts();
+
+        // Export config for main store
+        function updateMainStore() {
+            // This will be read by index.html from localStorage
+            console.log('Config updated');
+        }
+    </script>
+</body>
+</html>
